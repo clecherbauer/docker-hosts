@@ -96,6 +96,6 @@ release:
         - name: 'MacOS executable'
           url: '$CI_PROJECT_URL/-/jobs/${MACOS_JOB_ID}/artifacts/raw/docker-hosts.macOS64.zip'
         - name: 'Windows executable'
-          url: '$CI_PROJECT_URL/-/jobs/${MACOS_JOB_ID}/artifacts/raw/docker-hosts.win64.zip'
+          url: '$CI_PROJECT_URL/-/jobs/${WINDOWS_JOB_ID}/artifacts/raw/docker-hosts.win64.zip'
   only:
     - tags
