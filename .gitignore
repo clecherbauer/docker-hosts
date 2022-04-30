@@ -1,0 +1,9 @@
+.idea
+.pydeps
+build
+dist
+*.spec
+.env
+docker-hosts/
+docker-hosts.*.zip
+__pycache__
