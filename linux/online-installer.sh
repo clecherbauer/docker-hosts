@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION="v1.0.0-beta"
+VERSION="v1.0.0"
 SOURCE_FILE="docker-hosts.linux64.zip"
 SOURCE_DIR="docker-hosts"
 
@@ -12,7 +12,7 @@ wget $URL
 unzip -o "$SOURCE_FILE"
 (
   cd "$SOURCE_DIR"
-  #./setup.sh
+  ./setup.sh install
 )
 
 rm -Rf "$SOURCE_DIR"

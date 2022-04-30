@@ -33,7 +33,6 @@ function build_macos() {
     pyinstaller -y --clean --noupx -F docker-hosts.py
     mkdir "$ZIP_DIR"
     cp -R dist/docker-hosts "$ZIP_DIR"
-    cp macos/setup.sh "$ZIP_DIR"
     zip -r "$ZIP_MACOS64" "$ZIP_DIR"
 }
 

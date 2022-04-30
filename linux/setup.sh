@@ -1,40 +1,41 @@
 #!/usr/bin/env bash
-
 set -e
 
-USER_BIN_DIR="$HOME/.local/bin"
-USER_SYSTEMD_UNIT_DIR="$HOME/.config/systemd/user"
-DOCKER_ALIAS_ROOT="$HOME/.local/docker-alias"
-DOCKER_ALIAS_BINARY_ROOT="$DOCKER_ALIAS_ROOT/bin"
-DOCKER_ALIAS_CONFIG_ROOT="$HOME/.config/docker-alias"
-DOCKER_ALIAS_CLI_BINARY="$DOCKER_ALIAS_ROOT/cli/cli"
-DOCKER_ALIAS_CLI_SYMLINK="$USER_BIN_DIR/docker-alias"
+DOCKER_HOSTS_BINARY_ROOT="/usr/local/bin"
+DOCKER_HOSTS_BINARY="docker-hosts"
 
-DOCKER_ALIAS_DAEMON_SYSTEMD_FILE="docker-alias.service"
-DOCKER_ALIAS_DAEMON_SYSTEMD_UNIT_PATH="$DOCKER_ALIAS_ROOT/daemon/$DOCKER_ALIAS_DAEMON_SYSTEMD_FILE"
-DOCKER_ALIAS_DAEMON_SYSTEMD_SYMLINK="$USER_SYSTEMD_UNIT_DIR/$DOCKER_ALIAS_DAEMON_SYSTEMD_FILE"
+SYSTEMD_ROOT_DIR="/etc/systemd/system"
+SYSTEMD_SERVICE_FILE="docker-hosts.service"
+SYSTEMD_SYMLINK="$SYSTEMD_ROOT_DIR/$SYSTEMD_SERVICE_FILE"
 
-BASH_PROFILE="$HOME/.profile"
-DOCKER_ALIAS_PATH="PATH=\$HOME/.local/docker-alias/bin:\$PATH"
-
-if [ ! -d "$USER_BIN_DIR" ]; then mkdir "$USER_BIN_DIR"; fi
-if [ ! -d "$USER_SYSTEMD_UNIT_DIR" ]; then mkdir -p "$USER_SYSTEMD_UNIT_DIR"; fi
-if [ ! -d "$DOCKER_ALIAS_ROOT" ]; then mkdir "$DOCKER_ALIAS_ROOT"; fi
-if [ ! -d "$DOCKER_ALIAS_CONFIG_ROOT" ]; then mkdir "$DOCKER_ALIAS_CONFIG_ROOT"; fi
-if [ ! -d "$DOCKER_ALIAS_BINARY_ROOT" ]; then mkdir "$DOCKER_ALIAS_BINARY_ROOT"; fi
-if [ -f "$DOCKER_ALIAS_CLI_SYMLINK" ]; then rm "$DOCKER_ALIAS_CLI_SYMLINK"; fi
-if [ -f "$DOCKER_ALIAS_DAEMON_SYSTEMD_SYMLINK" ]; then rm "$DOCKER_ALIAS_DAEMON_SYSTEMD_SYMLINK"; fi
-
-systemctl --user stop "$DOCKER_ALIAS_DAEMON_SYSTEMD_FILE" || true
-cp -r . "$DOCKER_ALIAS_ROOT"
-chmod +x "$DOCKER_ALIAS_CLI_BINARY"
-ln -s "$DOCKER_ALIAS_CLI_BINARY" "$DOCKER_ALIAS_CLI_SYMLINK"
-ln -s "$DOCKER_ALIAS_DAEMON_SYSTEMD_UNIT_PATH" "$DOCKER_ALIAS_DAEMON_SYSTEMD_SYMLINK"
-systemctl --user daemon-reload
-systemctl --user enable "$DOCKER_ALIAS_DAEMON_SYSTEMD_FILE"
-systemctl --user start "$DOCKER_ALIAS_DAEMON_SYSTEMD_FILE"
-
-if ! grep -q "$DOCKER_ALIAS_PATH" "$BASH_PROFILE"; then
-  echo "$DOCKER_ALIAS_PATH" >> "$BASH_PROFILE"
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
 fi
-source "$BASH_PROFILE"
+
+function install() {
+  systemctl stop "$SYSTEMD_SERVICE_FILE" || true
+  chmod +x "$DOCKER_HOSTS_BINARY"
+  cp -r "$DOCKER_HOSTS_BINARY" "$DOCKER_HOSTS_BINARY_ROOT"
+  ln -s "$DOCKER_HOSTS_BINARY_ROOT/$DOCKER_HOSTS_BINARY" "$SYSTEMD_SYMLINK"
+
+  systemctl daemon-reload
+  systemctl enable "$SYSTEMD_SERVICE_FILE"
+  systemctl start "$SYSTEMD_SERVICE_FILE"
+}
+
+function uninstall() {
+  systemctl stop "$SYSTEMD_SERVICE_FILE" || true
+  systemctl disable "$SYSTEMD_SERVICE_FILE" || true
+
+  rm "$DOCKER_HOSTS_BINARY" "$DOCKER_HOSTS_BINARY_ROOT/$DOCKER_HOSTS_BINARY"
+  rm "$SYSTEMD_SYMLINK"
+}
+
+if [ "$1" == "install" ]; then
+  install
+fi
+
+if [ "$1" == "uninstall" ]; then
+  uninstall
+fi

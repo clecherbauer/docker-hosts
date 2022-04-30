@@ -19,8 +19,6 @@ generate_linux:
       - docker-hosts.linux64.zip
     reports:
       dotenv: linux.env
-  only:
-    - tags
 
 generate_macos:
   stage: generate
@@ -38,8 +36,6 @@ generate_macos:
       - docker-hosts.macOS64.zip
     reports:
       dotenv: macos.env
-  only:
-    - tags
 
 generate_windows:
   stage: generate
@@ -59,27 +55,23 @@ generate_windows:
       - docker-hosts.win64.zip
     reports:
       dotenv: windows.env
-  only:
-    - tags
 
 build:
   stage: build
   image: docker:git
   services:
     - name: docker:dind
-  variables:
-    IMAGE_NAME: $CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_TAG
   before_script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
   script:
+    - if [[ ! -z "$CI_COMMIT_TAG" ]]; then export IMAGE_TAG="$CI_COMMIT_TAG"; else export IMAGE_TAG="$CI_COMMIT_SHORT_SHA"; fi
+    - export IMAGE_NAME=$CI_REGISTRY/$CI_PROJECT_PATH:$IMAGE_TAG
     - touch .env
     - docker build -t $IMAGE_NAME .
     - docker push $IMAGE_NAME
   needs:
     - job: generate_linux
       artifacts: true
-  only:
-    - tags
 
 release:
   stage: release

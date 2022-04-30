@@ -18,7 +18,7 @@ It's possible to run `docker-hosts` from inside a docker container itself, givin
 docker run -d \
   --network none --restart always \
   -v /etc/hosts:/etc/hosts -v /var/run/docker.sock:/var/run/docker.sock \
-  clecherbauer/docker-hosts
+  registry.gitlab.com/clecherbauer/tools/docker-hosts:v1.0.0
 ```
 
 Alternatively, you can also install `docker-hosts` directly:
@@ -28,14 +28,14 @@ Linux (Tested with Ubuntu 20.04)
 wget -q -O - "https://raw.githubusercontent.com/clecherbauer/docker-hosts/1.0.0/linux/online-installer.sh" | sudo bash
 ```
 
-MacOS
+MacOS (Not tested yet)
 ```
-wget -q -O - "https://raw.githubusercontent.com/clecherbauer/docker-hosts/1.0.0/macos/online-installer.sh" | wheel bash
+There is no automatic installation yet, please download and install manually
 ```
 
 Windows (Tested with Windows 10)
 ```
-download and install manually
+There is no automatic installation yet, please download and install manually
 ```
 
 
