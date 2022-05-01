@@ -3,3 +3,4 @@ autopep8
 pyinstaller
 daemoniker
 click
+psutil

@@ -45,6 +45,7 @@ generate_windows:
   script:
     - apt update
     - apt install zip -y
+    - export REQUIREMENTS_TXT=requirements_windows.txt
     - pyinstaller-windows() { /usr/local/bin/entrypoint.sh "$@"; }
     - export -f pyinstaller-windows
     - source ./build.sh
