@@ -14,7 +14,7 @@ function install() {
         docker-hosts stop
     fi
     chmod +x "$DOCKER_HOSTS_BINARY"
-    cp ./bu"$DOCKER_HOSTS_BINARY" "$DOCKER_HOSTS_BINARY_ROOT"
+    cp ./"$DOCKER_HOSTS_BINARY" "$DOCKER_HOSTS_BINARY_ROOT"
 }
 
 function uninstall() {

@@ -9,8 +9,10 @@ Inspired by [`costela/docker-etchosts`](https://github.com/costela/docker-etchos
 ## Supported Setups
 - Directly in Docker
 - Linux (Tested with Ubuntu 20.04) 
-- MacOS with Docker-Desktop
-- Windows with Docker-Desktop
+- MacOS with Docker-Desktop*
+- Windows with Docker-Desktop*
+
+*In a Docker-Desktop Environment the IP of the Docker-Desktop-VM gets exposed instead of the IP of the Container. To access the containers you need to install a Proxy like Traefik.
 
 ## Installation
 
@@ -19,25 +21,29 @@ It's possible to run `docker-hosts` from inside a docker container itself, givin
 docker run -d \
   --network none --restart always \
   -v /etc/hosts:/etc/hosts -v /var/run/docker.sock:/var/run/docker.sock \
-  registry.gitlab.com/clecherbauer/tools/docker-hosts:v1.1.1
+  registry.gitlab.com/clecherbauer/tools/docker-hosts:v1.2.0
 ```
 
 Alternatively, you can also install `docker-hosts` directly:
 
 ### Linux (Tested with Ubuntu 20.04)
+Run following command:
 ```
-wget -q -O - "https://gitlab.com/clecherbauer/tools/docker-hosts/-/raw/v1.1.1/linux/online-installer.sh" | sudo bash
+wget -q -O - "https://gitlab.com/clecherbauer/tools/docker-hosts/-/raw/v1.2.0/linux/online-installer.sh" | sudo bash
 ```
 
 ### MacOS (Not tested yet)
 
-There is no automatic installation yet, please download from [v1.1.1 release](https://gitlab.com/clecherbauer/tools/docker-hosts/-/releases/v1.1.1) and install manually
+There is no automatic installation yet, please download from [v1.2.0 release](https://gitlab.com/clecherbauer/tools/docker-hosts/-/releases/v1.2.0) and install manually
+
 
 
 ### Windows (Tested with Windows 10)
+Ensure that you are using an administrative powershell instance and run following command:
 
-There is no automatic installation yet, please download from [v1.1.1 release](https://gitlab.com/clecherbauer/tools/docker-hosts/-/releases/v1.1.1) and install manually 
-
+```
+Set-ExecutionPolicy Bypass-Scope Process-Force;[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://gitlab.com/clecherbauer/docker-hosts/-/raw/v1.2.0/windows/online-installer.ps1'))
+```
 
 
 ## Usage
@@ -68,6 +74,6 @@ All entries managed by `docker-hosts` will be removed upon termination, returnin
 
 `docker-hosts` can be configured with the following environment variables:
 
-- **`DOCKER_HOSTS_MODE`**: (default: `native`, possible values: `native` `docker-desktop`)
+- **`DOCKER_HOSTS_MODE`**: (default on linux: `native`, default on windows: `docker-desktop`, default on macos: `docker-desktop`, possible values: `native` | `docker-desktop`)
 
 - **`DOCKER_HOSTS_FILE_PATH`**: path to hosts file (default `/etc/hosts`)

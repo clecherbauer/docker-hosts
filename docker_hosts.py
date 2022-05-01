@@ -7,13 +7,9 @@ import time
 import platform
 import traceback
 from dataclasses import dataclass
-from pathlib import Path
 from subprocess import check_output
 from typing import List
 
-import click
-import daemoniker
-from psutil import pid_exists
 
 HOSTS_FILE_LOCATION_WINDOWS = "C:\\Windows\\System32\\Drivers\\etc\\hosts"
 HOSTS_FILE_LOCATION_LINUX = "/etc/hosts"
@@ -28,21 +24,6 @@ MODES = [
 ]
 
 MARKER = "# !!! managed by clecherbauer/docker-hosts !!!"
-
-CONFIG_DIR = os.path.join(str(Path.home()), '.config', 'docker-hosts')
-
-
-def get_config_dir():
-    if not os.path.isdir(CONFIG_DIR):
-        os.mkdir(CONFIG_DIR)
-    return CONFIG_DIR
-
-
-DEFAULT_PID_FILE = os.path.join(get_config_dir(), "docker-hosts.pid")
-
-
-def get_pid_file() -> str:
-    return os.environ.get("DOCKER_HOSTS_PID_FILE", DEFAULT_PID_FILE)
 
 
 def os_is_windows():
@@ -83,51 +64,35 @@ def get_mode():
     return _mode
 
 
-def get_host_file_path():
-    _hosts_file_path = None
-    if 'DOCKER_HOSTS_FILE_PATH' in os.environ:
-        hosts_file_path = os.getenv('DOCKER_HOSTS_FILE_PATH')
-        if os.path.isfile(hosts_file_path):
-            _hosts_file_path = hosts_file_path
-        else:
-            print('Warning: File does not exist: {hosts_file_path}'.format(
-                hosts_file_path=hosts_file_path
-            ))
-    else:
-        if os_is_windows():
-            _hosts_file_path = HOSTS_FILE_LOCATION_WINDOWS
-
-        if os_is_linux():
-            _hosts_file_path = HOSTS_FILE_LOCATION_LINUX
-
-        if os_is_mac():
-            _hosts_file_path = HOSTS_FILE_LOCATION_MAC
-    return _hosts_file_path
-
-
 @dataclass
 class Host:
     ip: str
     aliases: [str]
 
 
-class Daemon:
+class DockerHosts:
     hosts: List[Host] = []
     mode: str = None
     hosts_file_path: str = None
+    should_run = False
 
     def __init__(self, mode, hosts_file_path):
         self.mode = mode
         self.hosts_file_path = hosts_file_path
 
     def run(self):
-        while True:
+        self.should_run = True
+        while self.should_run:
             try:
                 hosts = self.get_hosts()
                 self.modify_hosts_file(hosts)
                 time.sleep(5)
             except Exception:
                 traceback.print_exc()
+
+    def stop(self):
+        self.should_run = False
+        self.cleanup()
 
     def get_hosts(self) -> []:
         hosts = []
@@ -234,50 +199,5 @@ class Daemon:
             st = os.stat(source)
             os.chown(target, st.st_uid, st.st_gid)
 
-
-@click.group()
-def cli() -> None:
-    pass
-
-
-@cli.command("start")
-@click.option("--no-daemon", is_flag=True, flag_value=True, default=False)
-def start(no_daemon) -> None:
-
-    mode = get_mode()
-    host_file_path = get_host_file_path()
-
-    if no_daemon:
-        try:
-            Daemon(mode, host_file_path).run()
-        except KeyboardInterrupt:
-            pass
-        finally:
-            Daemon(mode, host_file_path).modify_hosts_file([])
-    else:
-        with daemoniker.Daemonizer() as (_, daemonizer):
-            try:
-                is_parent, *_ = daemonizer(get_pid_file())
-            except SystemExit as e:
-                if str(e) == 'Unable to acquire PID file.':
-                    with open(get_pid_file()) as f:
-                        pid = int(f.read())
-                    if pid_exists(pid):
-                        sys.exit(0)
-                    os.remove(get_pid_file())
-        Daemon(mode, host_file_path).run()
-
-
-@cli.command("stop")
-def stop() -> None:
-    mode = get_mode()
-    host_file_path = get_host_file_path()
-    if not os.path.isfile(get_pid_file()):
-        print("Warning: docker-host was not running!")
-    else:
-        daemoniker.send(get_pid_file(), daemoniker.SIGINT)
-    Daemon(mode, host_file_path).modify_hosts_file([])
-
-
-if __name__ == '__main__':
-    cli()
+    def cleanup(self):
+        self.modify_hosts_file([])
