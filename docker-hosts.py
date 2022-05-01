@@ -13,6 +13,7 @@ from typing import List
 
 import click
 import daemoniker
+from psutil import pid_exists
 
 HOSTS_FILE_LOCATION_WINDOWS = "C:\\Windows\\System32\\Drivers\\etc\\hosts"
 HOSTS_FILE_LOCATION_LINUX = "/etc/hosts"
@@ -255,7 +256,15 @@ def start(no_daemon) -> None:
             Daemon(mode, host_file_path).modify_hosts_file([])
     else:
         with daemoniker.Daemonizer() as (_, daemonizer):
-            is_parent, *_ = daemonizer(get_pid_file())
+            try:
+                is_parent, *_ = daemonizer(get_pid_file())
+            except SystemExit as e:
+                if str(e) == 'Unable to acquire PID file.':
+                    with open(get_pid_file()) as f:
+                        pid = int(f.read())
+                    if pid_exists(pid):
+                        sys.exit(0)
+                    os.remove(get_pid_file())
         Daemon(mode, host_file_path).run()
 
 
