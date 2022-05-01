@@ -22,7 +22,6 @@ function build_linux() {
 
     mkdir "$ZIP_DIR"
     cp -R dist/docker-hosts "$ZIP_DIR"
-    cp linux/docker-hosts.service "$ZIP_DIR"
     cp linux/setup.sh "$ZIP_DIR"
     zip -r "$ZIP_LINUX64" "$ZIP_DIR"
 }
@@ -45,10 +44,10 @@ function build_windows() {
 }
 
 if [ "$1" == "all" ]; then
-  if [ -f "./$ZIP_LINUX64" ]; then rm "./$ZIP_LINUX64"; fi
-  if [ -f "./$ZIP_WIN64" ]; then rm "./$ZIP_WIN64"; fi
-  if [ -f "./$ZIP_MACOS64" ]; then rm "./$ZIP_MACOS64"; fi
-  build_linux
-  build_macos
-  build_windows
+    if [ -f "./$ZIP_LINUX64" ]; then rm "./$ZIP_LINUX64"; fi
+    if [ -f "./$ZIP_WIN64" ]; then rm "./$ZIP_WIN64"; fi
+    if [ -f "./$ZIP_MACOS64" ]; then rm "./$ZIP_MACOS64"; fi
+    build_linux
+    build_macos
+    build_windows
 fi

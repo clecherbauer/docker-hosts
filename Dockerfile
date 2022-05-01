@@ -9,4 +9,7 @@ RUN cp docker-hosts/docker-hosts /usr/local/bin
 
 ENV DOCKER_HOSTS_MODE=native
 ENV DOCKER_HOSTS_FILE_PATH=/etc/hosts
-ENTRYPOINT /usr/local/bin/docker-hosts
+
+RUN mkdir -p "$HOME/.config/docker-hosts/"
+
+ENTRYPOINT /usr/local/bin/docker-hosts start --no-daemon

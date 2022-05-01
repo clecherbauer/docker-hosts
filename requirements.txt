@@ -1,2 +1,5 @@
 flake8
+autopep8
 pyinstaller
+daemoniker
+click
