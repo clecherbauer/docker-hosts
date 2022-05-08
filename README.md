@@ -21,7 +21,7 @@ It's possible to run `docker-hosts` from inside a docker container itself, givin
 docker run -d \
   --network none --restart always \
   -v /etc/hosts:/etc/hosts -v /var/run/docker.sock:/var/run/docker.sock \
-  registry.gitlab.com/clecherbauer/tools/docker-hosts:v1.2.0
+  registry.gitlab.com/clecherbauer/tools/docker-hosts:v1.2.1
 ```
 
 Alternatively, you can also install `docker-hosts` directly:
@@ -29,12 +29,12 @@ Alternatively, you can also install `docker-hosts` directly:
 ### Linux (Tested with Ubuntu 20.04)
 Run following command:
 ```
-wget -q -O - "https://gitlab.com/clecherbauer/tools/docker-hosts/-/raw/v1.2.0/linux/online-installer.sh" | sudo bash
+wget -q -O - "https://gitlab.com/clecherbauer/tools/docker-hosts/-/raw/v1.2.1/linux/online-installer.sh" | sudo bash
 ```
 
 ### MacOS (Not tested yet)
 
-There is no automatic installation yet, please download from [v1.2.0 release](https://gitlab.com/clecherbauer/tools/docker-hosts/-/releases/v1.2.0) and install manually
+There is no automatic installation yet, please download from [v1.2.1 release](https://gitlab.com/clecherbauer/tools/docker-hosts/-/releases/v1.2.1) and install manually
 
 
 
@@ -42,7 +42,7 @@ There is no automatic installation yet, please download from [v1.2.0 release](ht
 Ensure that you are using an administrative powershell instance and run following command:
 
 ```
-Set-ExecutionPolicy Bypass-Scope Process-Force;[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://gitlab.com/clecherbauer/docker-hosts/-/raw/v1.2.0/windows/online-installer.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://gitlab.com/clecherbauer/tools/docker-hosts/-/raw/v1.2.1/windows/online-installer.ps1'))
 ```
 
 
