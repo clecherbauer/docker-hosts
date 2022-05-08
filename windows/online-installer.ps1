@@ -17,7 +17,7 @@ foreach ($release in $releases){
 }
 Invoke-WebRequest -Uri $zip_url -OutFile docker-hosts.win64.zip
 
-$service = Get-Service -Name docker-hosts -ErrorAction SilentlyContinue
+$service = Get-Service -Name DockerHosts -ErrorAction SilentlyContinue
 if ($service.Length -gt 0) {
     & 'C:\Program Files\docker-hosts\docker-hosts.exe' stop
     Start-Sleep -s 5
