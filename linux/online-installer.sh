@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION="v1.2.1"
+VERSION="v1.2.2"
 
 SOURCE_FILE="docker-hosts.linux64.zip"
 SOURCE_DIR="docker-hosts"

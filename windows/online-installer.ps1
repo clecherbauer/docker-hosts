@@ -2,7 +2,7 @@
 #Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 
-$VERSION = "v1.2.1"
+$VERSION = "v1.2.2"
 $SOURCE_FILE = "docker-hosts.win64.zip"
 $SOURCE_DIR = "docker-hosts"
 
